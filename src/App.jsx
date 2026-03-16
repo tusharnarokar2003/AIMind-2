@@ -7,44 +7,45 @@ import GoalPage from "./pages/GoalPage";
 import ChatPage from "./pages/ChatPage";
 import CommunityPage from "./pages/CommunityPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { MoodProvider } from "./context/MoodContext";
 
 export default function App() {
   return (
     <AuthProvider>
-      <Routes>
-        {/* Public route */}
-        <Route path="/" element={<AuthPage />} />
-
-        {/* Protected routes */}
-        <Route path="/home" element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        } />
-        <Route path="/journaling" element={
-          <ProtectedRoute>
-            <NotesPage />
-          </ProtectedRoute>
-        } />
-        <Route path="/goal" element={
-          <ProtectedRoute>
-            <GoalPage />
-          </ProtectedRoute>
-        } />
-        <Route path="/chat" element={
-          <ProtectedRoute>
-            <ChatPage />
-          </ProtectedRoute>
-        } />
-        <Route path="/community" element={
-          <ProtectedRoute>
-            <CommunityPage />
-          </ProtectedRoute>
-        } />
-
-        {/* Redirect any unknown routes to auth */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+    
+      <MoodProvider>
+        <Routes>
+          <Route path="/" element={<AuthPage />} />
+          
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/journaling" element={
+            <ProtectedRoute>
+              <NotesPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/goal" element={
+            <ProtectedRoute>
+              <GoalPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/community" element={
+            <ProtectedRoute>
+              <CommunityPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </MoodProvider>
     </AuthProvider>
   );
 }

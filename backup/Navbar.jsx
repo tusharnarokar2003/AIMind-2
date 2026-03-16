@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 export default function Navbar() {
   return (
     <header className="navbar">
-      {/* Left Buttons */}
+      
       <nav className="navbar-left">
-        {/* Home → /home */}
+        
         <Link to="/home" className="nav-btn">
           Home
         </Link>
 
-        {/* journaling → /journaling */}
+        
         <Link to="/journaling" className="nav-btn">
           Journaing
         </Link>
@@ -30,7 +30,7 @@ export default function Navbar() {
         
       </nav>
 
-      {/* Right Icons */}
+   \
       <div className="navbar-right">
         <div className="nav-logo">AIMind</div>
 

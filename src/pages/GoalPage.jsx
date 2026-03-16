@@ -1,38 +1,25 @@
-// src/pages/GoalPage.jsx
+
 import Navbar from "../components/Navbar";
 import "./GoalPage.css";
-import profileImg from "../assets/profileBanner.png"; // your uploaded image
 
 export default function GoalPage() {
   return (
-    
-    <div className="goal-wrapper">
-      {/* Top section */}
-      <header className="goal-header">
-        <h2 className="brand">AI Mind</h2>
-        <p className="safe-space">YOUR <br /> SAFE SPACE</p>
-      </header>
-
-      {/* Banner Section */}
-      <div className="goal-banner">
-        
-        <div className="goal-text">
-          <h1>Tushar</h1>
-          <h1>Narokar</h1>
-        </div>
-
-        <div className="goal-image">
-          <img src={profileImg} alt="profile" />
-        </div>
-      </div>
-
-
-
-
-
+    <>
+      <Navbar />
+      <div className="goal-wrapper">
+     
 
   
+        <div className="center-section">
+          <h1 className="main-title">
+            Your Mental<span className="sparkle">✨</span><br />
+            Health Matter
+          </h1>
+        </div>
 
-    </div>
+   
+      
+      </div>
+    </>
   );
 }

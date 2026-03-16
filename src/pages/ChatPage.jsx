@@ -1,19 +1,13 @@
 import Navbar from "../components/Navbar";
+import MentalHealthChat from "../components/Chat/MentalHealthChat";
 import "./ChatPage.css";
 
-export default function ComingSoon() {
+export default function ChatPage() {
   return (
-    <div className="coming-wrapper">
+    <div className="chat-page-wrapper">
       <Navbar />
-
-      <div className="coming-content">
-        <h1 className="coming-title">Coming Soon</h1>
-        <p className="coming-text">
-          We’re working hard to bring this feature to you.<br />
-          Stay tuned for updates!
-        </p>
-
-        <div className="coming-badge">AIMind</div>
+      <div className="chat-page-content">
+        <MentalHealthChat />
       </div>
     </div>
   );

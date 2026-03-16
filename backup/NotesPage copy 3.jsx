@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import "./NotesPage.css";
 import { supabase } from "../../supabaseClient";
 import Navbar from "../../components/Navbar";
-import { moodService } from '../../services/moodService';
-import { useMood } from '../../context/MoodContext';
+
+
 
 export default function NotesPage() {
   // -------------------------
@@ -20,12 +20,8 @@ export default function NotesPage() {
 
   const [noteText, setNoteText] = useState("");
   const [comment, setComment] = useState("");
-
+ 
   const [loading, setLoading] = useState(false);
-
-  const [analyzingMood, setAnalyzingMood] = useState(false);
-  const [moodAnalysisComplete, setMoodAnalysisComplete] = useState(false);
-  const { refreshMood } = useMood();
 
   // Color palette for notes
   const colors = ["yellow", "green", "blue", "pink", "orange"];
@@ -78,8 +74,6 @@ export default function NotesPage() {
     setEditId(null);
     setNoteText("");
     setComment("");
-    setMoodAnalysisComplete(false);
-    setAnalyzingMood(false);
     setShowModal(true);
   }
 
@@ -93,8 +87,6 @@ export default function NotesPage() {
     setEditId(id);
     setNoteText(n.noteText);
     setComment(n.comment || "");
-    setMoodAnalysisComplete(false);
-    setAnalyzingMood(false);
     setShowModal(true);
   }
 
@@ -111,12 +103,9 @@ export default function NotesPage() {
 
     try {
       setLoading(true);
-      setMoodAnalysisComplete(false);
-      
-      let savedNoteId = null;
 
       if (editId) {
-        // UPDATE EXISTING NOTE
+        // UPDATE
         const { error } = await supabase
           .from("journal")
           .update({
@@ -128,70 +117,28 @@ export default function NotesPage() {
         if (error) {
           console.error(error);
           alert("Error updating note");
-          setLoading(false);
           return;
         }
-
-        savedNoteId = editId;
       } else {
-        // INSERT NEW NOTE
-        const { data, error } = await supabase
-          .from("journal")
-          .insert([
-            {
-              noteText,
-              comment,
-              favorite: false,
-            },
-          ])
-          .select()
-          .single();
+        // INSERT
+        const { error } = await supabase.from("journal").insert([
+          {
+            noteText,
+            comment,
+            favorite: false,
+          },
+        ]);
 
         if (error) {
           console.log("SUPABASE INSERT ERROR:", error);
           alert("Error saving note: " + error.message);
-          setLoading(false);
           return;
         }
-
-        savedNoteId = data.id;
       }
 
-      setLoading(false);
-
-      // TRIGGER MOOD ANALYSIS
-      console.log('Journal saved! Analyzing mood...');
-      setAnalyzingMood(true);
-
-      try {
-        // Call backend to analyze mood
-        await moodService.analyzeMood(savedNoteId, noteText);
-
-        console.log('Mood analysis complete!');
-        setMoodAnalysisComplete(true);
-
-        // Wait a moment, then refresh mood context
-        setTimeout(async () => {
-          await refreshMood();
-          console.log('Mood context refreshed');
-        }, 1000);
-
-      } catch (moodError) {
-        console.error('Mood analysis failed:', moodError);
-        alert('Note saved, but mood analysis failed. Your personalization may not update.');
-      } finally {
-        setAnalyzingMood(false);
-      }
-
-      // Keep modal open briefly to show success
-      setTimeout(() => {
-        setShowModal(false);
-        loadNotes();
-      }, 1500);
-
-    } catch (error) {
-      console.error('Error saving note:', error);
-      alert('Failed to save note');
+      setShowModal(false);
+      await loadNotes();
+    } finally {
       setLoading(false);
     }
   }
@@ -285,13 +232,14 @@ export default function NotesPage() {
   // -----------------------
   return (
     <div className="notes-wrapper">
-      <Navbar />
+      <Navbar /> 
 
+      
       <div className="notes-page">
         {/* HEADER */}
         <div className="page-header">
           <h1 className="page-title">
-            <i className="fas fa-sticky-no"></i>
+            <i className="fas fa-sticky-note"></i> .
           </h1>
 
           <div className="page-actions">
@@ -303,17 +251,6 @@ export default function NotesPage() {
               <i className="fas fa-plus"></i> Add
             </button>
           </div>
-        </div>
-
-        {/* ADD NEW JOURNAL BUTTON */}
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <button 
-            className="btn btn-primary" 
-            onClick={openAddModal}
-            style={{ padding: '12px 30px', fontSize: '16px' }}
-          >
-            <i className="fas fa-plus"></i> Write New Journal
-          </button>
         </div>
 
         {/* FILTERS */}
@@ -367,8 +304,8 @@ export default function NotesPage() {
         ) : (
           <div className="notes-grid">
             {filtered.map((note) => (
-              <div
-                key={note.id}
+              <div 
+                key={note.id} 
                 className={`note-card ${getRandomColor(note.id)}`}
               >
                 <div className="note-header">
@@ -378,8 +315,9 @@ export default function NotesPage() {
                       onClick={() => toggleFavorite(note.id)}
                     >
                       <i
-                        className={`fas fa-star${note.favorite ? "" : "-o"
-                          }`}
+                        className={`fas fa-star${
+                          note.favorite ? "" : "-o"
+                        }`}
                       ></i>
                     </button>
 
@@ -424,15 +362,6 @@ export default function NotesPage() {
           </div>
         )}
 
-        {/* FLOATING ADD BUTTON */}
-        <button 
-          className="floating-add-btn" 
-          onClick={openAddModal}
-          title="Add New Journal"
-        >
-          <i className="fas fa-plus"></i>
-        </button>
-
         {/* MODAL */}
         {showModal && (
           <div className="modal" onClick={() => setShowModal(false)}>
@@ -448,40 +377,18 @@ export default function NotesPage() {
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   required
-                  disabled={loading || analyzingMood}
                 ></textarea>
 
                 <label>Comment</label>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  disabled={loading || analyzingMood}
                 ></textarea>
 
                 <br />
 
-                {/* ADD MOOD ANALYSIS STATUS */}
-                {analyzingMood && (
-                  <div className="mood-analysis-status">
-                    <i className="fas fa-brain"></i> Analyzing your mood...
-                  </div>
-                )}
-
-                {moodAnalysisComplete && (
-                  <div className="mood-analysis-success">
-                    <i className="fas fa-check-circle"></i> Mood detected! Your homepage will update.
-                  </div>
-                )}
-
-                <button
-                  className="btn btn-primary"
-                  style={{ width: "100%" }}
-                  disabled={loading || analyzingMood}
-                >
-                  {loading ? "Saving..." :
-                    analyzingMood ? "Analyzing Mood..." :
-                      moodAnalysisComplete ? "Success! ✓" :
-                        editId ? "Update Note" : "Save Note"}
+                <button className="btn btn-primary" style={{ width: "100%" }}>
+                  {editId ? "Update Note" : "Save Note"}
                 </button>
               </form>
             </div>

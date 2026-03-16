@@ -78,8 +78,6 @@ export default function NotesPage() {
     setEditId(null);
     setNoteText("");
     setComment("");
-    setMoodAnalysisComplete(false);
-    setAnalyzingMood(false);
     setShowModal(true);
   }
 
@@ -93,8 +91,6 @@ export default function NotesPage() {
     setEditId(id);
     setNoteText(n.noteText);
     setComment(n.comment || "");
-    setMoodAnalysisComplete(false);
-    setAnalyzingMood(false);
     setShowModal(true);
   }
 
@@ -111,9 +107,9 @@ export default function NotesPage() {
 
     try {
       setLoading(true);
-      setMoodAnalysisComplete(false);
-      
-      let savedNoteId = null;
+      setMoodAnalysisComplete(false); // ✨ Reset mood status
+
+      let savedNoteId = null; // ✨ Track which note was saved
 
       if (editId) {
         // UPDATE EXISTING NOTE
@@ -128,11 +124,10 @@ export default function NotesPage() {
         if (error) {
           console.error(error);
           alert("Error updating note");
-          setLoading(false);
           return;
         }
 
-        savedNoteId = editId;
+        savedNoteId = editId; // ✨ Store ID for mood analysis
       } else {
         // INSERT NEW NOTE
         const { data, error } = await supabase
@@ -144,22 +139,19 @@ export default function NotesPage() {
               favorite: false,
             },
           ])
-          .select()
+          .select() // ✨ IMPORTANT: Get the inserted record back
           .single();
 
         if (error) {
           console.log("SUPABASE INSERT ERROR:", error);
           alert("Error saving note: " + error.message);
-          setLoading(false);
           return;
         }
 
-        savedNoteId = data.id;
+        savedNoteId = data.id; // ✨ Store ID for mood analysis
       }
 
-      setLoading(false);
-
-      // TRIGGER MOOD ANALYSIS
+      // ✨ TRIGGER MOOD ANALYSIS
       console.log('Journal saved! Analyzing mood...');
       setAnalyzingMood(true);
 
@@ -172,26 +164,28 @@ export default function NotesPage() {
 
         // Wait a moment, then refresh mood context
         setTimeout(async () => {
-          await refreshMood();
+          await refreshMood(); // ✨ Update global mood state
           console.log('Mood context refreshed');
         }, 1000);
 
       } catch (moodError) {
+        // ✨ Don't fail the save if mood analysis fails
         console.error('Mood analysis failed:', moodError);
         alert('Note saved, but mood analysis failed. Your personalization may not update.');
       } finally {
         setAnalyzingMood(false);
       }
 
-      // Keep modal open briefly to show success
+      // ✨ Keep modal open briefly to show success
       setTimeout(() => {
         setShowModal(false);
-        loadNotes();
+        loadNotes(); // Reload notes list
       }, 1500);
 
     } catch (error) {
       console.error('Error saving note:', error);
       alert('Failed to save note');
+    } finally {
       setLoading(false);
     }
   }
@@ -287,11 +281,12 @@ export default function NotesPage() {
     <div className="notes-wrapper">
       <Navbar />
 
+
       <div className="notes-page">
         {/* HEADER */}
         <div className="page-header">
           <h1 className="page-title">
-            <i className="fas fa-sticky-no"></i>
+            <i className="fas fa-sticky-note"></i> .
           </h1>
 
           <div className="page-actions">
@@ -303,17 +298,6 @@ export default function NotesPage() {
               <i className="fas fa-plus"></i> Add
             </button>
           </div>
-        </div>
-
-        {/* ADD NEW JOURNAL BUTTON */}
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <button 
-            className="btn btn-primary" 
-            onClick={openAddModal}
-            style={{ padding: '12px 30px', fontSize: '16px' }}
-          >
-            <i className="fas fa-plus"></i> Write New Journal
-          </button>
         </div>
 
         {/* FILTERS */}
@@ -424,15 +408,6 @@ export default function NotesPage() {
           </div>
         )}
 
-        {/* FLOATING ADD BUTTON */}
-        <button 
-          className="floating-add-btn" 
-          onClick={openAddModal}
-          title="Add New Journal"
-        >
-          <i className="fas fa-plus"></i>
-        </button>
-
         {/* MODAL */}
         {showModal && (
           <div className="modal" onClick={() => setShowModal(false)}>
@@ -460,7 +435,7 @@ export default function NotesPage() {
 
                 <br />
 
-                {/* ADD MOOD ANALYSIS STATUS */}
+                {/* ✨ ADD MOOD ANALYSIS STATUS */}
                 {analyzingMood && (
                   <div className="mood-analysis-status">
                     <i className="fas fa-brain"></i> Analyzing your mood...
@@ -476,7 +451,7 @@ export default function NotesPage() {
                 <button
                   className="btn btn-primary"
                   style={{ width: "100%" }}
-                  disabled={loading || analyzingMood}
+                  disabled={loading || analyzingMood} // ✨ Disable during analysis
                 >
                   {loading ? "Saving..." :
                     analyzingMood ? "Analyzing Mood..." :

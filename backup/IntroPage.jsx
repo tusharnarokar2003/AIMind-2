@@ -1,4 +1,4 @@
-// src/pages/IntroPage.jsx
+
 import "./IntroPage.css";
 import { IoIosArrowForward } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ export default function IntroPage() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/home"); // move to HomePage
+    navigate("/home"); 
   };
 
   return (
